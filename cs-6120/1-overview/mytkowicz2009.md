@@ -1,8 +1,11 @@
 # Producting wrong data without doing anything obviously wrong!
 
-Tood Mytkowicz
+Todd Mytkowicz
+
 Amer Diwan
+
 Matthias Hauswirth
+
 Peter F. Sweeney
 
 ## Jargon
