@@ -1,8 +1,14 @@
 # Empricial evaluation guidelines
 
+## Jargon
+
 PL = Programming Languages
+
 ACM = Association for Computing Machinery
+
 SIGPLAN = ACM Special Interest Group on Programming Languages
+
+## Introduction
 
 Research into programming languages often produces ideas whose worth is evaluated empirically.
 In 2017 an ad hoc committee formed by SIGPLAN created a checklist for encouraging best practices around the creation and evaluation of empirical evidence.
