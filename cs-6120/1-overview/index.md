@@ -77,3 +77,7 @@ Your opinion.
 - Critical thinking about the merits and shortcomings of the work.
 - Discussion of the work's role in history and its connections to the general computing landscape.
 - A bulleted list of questions you have about the work.
+
+## Notes
+
+[SIGPLAN empirical evaluation checklist](./empirical-evaluation-guidelines.md)
