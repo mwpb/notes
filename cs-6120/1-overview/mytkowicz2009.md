@@ -41,10 +41,10 @@ We show that varying the experimental setup leads to differing conclusions about
 Moreover there is no obvious pattern or order to the variation of this effectiveness.
 Since hardware manufacturers do not reveal full details of their hardware it is also difficult to make theoretical predictions.
 
-A literature survey of 133 recent papers does not adequately take measurement bias into account.
+133 recent papers do not adequately take measurement bias into account.
 Many researchers use a multiple and varied workloads to try to account for measurement bias.
 However this is often insufficient because of bias inherent to the standard benchmarking suites.
 In this paper we show that SPEC CPU2006 is not diverse enough to cancel out measurement bias.
 
 Therefore it is necessary to consider the randomisation of the experimental setups themselves, which is called 'setup randomisation'.
-It is possible to detect measurement bias by performing a 'causal analysis', which evaluates the accuracy of a conclusion even in the presenceof measurement bias.
+It is also possible to detect measurement bias by performing a 'causal analysis', which evaluates the accuracy of a conclusion even in the presenceof measurement bias.
