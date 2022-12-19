@@ -1,6 +1,7 @@
 # Getting started with Bril
 
 [Bril homepage](https://capra.cs.cornell.edu/bril)
+
 [Bril GitHub](https://github.com/sampsyo/bril)
 
 Big red intermediate language.
@@ -58,3 +59,5 @@ Tasks:-
 1. Write a programme (in any language) to get the CFG of a Bril programme.
 2. Write one additional analysis tool (e.g. count number of add instructions).
 3. Write a new 'benchmark'. This is just a programme in the text representation that computes something appropriately mathematical.
+
+Maybe test against `bril/test/parse`, which contains JSON files.
