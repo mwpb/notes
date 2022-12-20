@@ -15,9 +15,11 @@ The nice thing is that it is extremely regular based on instructions and you can
 The canonical representation is a JSON document.
 This means that we don't have to write a parser because most languages have already implemented a JSON parser.
 
-Top level is a dictionary.
+Top level is a dictionary it has one key: `functions`.
+The `main` function is the first one to be invoked.
 The `.functions` list defines our functions, which in turn are objects with attributes like `name`, `instrs` and `args`.
 Each `instr` is just an object usually containing an `op` key.
+For precise details see the Bril homepage above.
 
 So for instance the function
 
@@ -60,4 +62,9 @@ Tasks:-
 2. Write one additional analysis tool (e.g. count number of add instructions).
 3. Write a new 'benchmark'. This is just a programme in the text representation that computes something appropriately mathematical.
 
-Maybe test against `bril/test/parse`, which contains JSON files.
+Test against `bril/test/interp/core/jmp.bril`, which you will have to pipe into `bril2json`.
+
+Ideas for CFGs:
+
+- Form blocks from the `instrs` list in all functions.
+- Calling function is not considered a terminator because the call will always return. Everything still executes. Hitting `ret` will terminate the basic block. This reflects the idea that a basic block is a list of instructions that will run all at once. (However the instructions within a function call are not counted.)

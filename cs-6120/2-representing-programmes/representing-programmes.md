@@ -63,9 +63,10 @@ The structure of CFG can tell you that there is some code that is useless and ca
 
 CFGs look redundant because there are many imperative flows.
 We coarsen the CFG by using basic blocks.
-A basic block is a sequence of instructions where jumps and branches can oly happen once at the end.
+A basic block is a sequence of instructions where jumps and branches can only happen once at the end.
 (An instruction that is either a jump or a branch is called a terminator.)
 Also all other jumps or branches can only transfer control to the beginning of a basic block.
+(mwpb: after reading several different treatments of basic blocks, some authors seems to want maximal basic blocks, which for instance do not end at a label that is never used.)
 
 How to extract a CFG from a list of instructions?
 First we get the basic blocks.
