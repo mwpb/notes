@@ -9,9 +9,7 @@
           "value": 4
         },
         {
-          "labels": [
-            "somewhere"
-          ],
+          "labels": ["somewhere"],
           "op": "jmp"
         },
         {
@@ -24,9 +22,7 @@
           "label": "somewhere"
         },
         {
-          "args": [
-            "v"
-          ],
+          "args": ["v"],
           "op": "print"
         }
       ],
