@@ -122,4 +122,66 @@ mod tests {
         ];
         assert!(expected_instrs.iter().eq(instrs.iter()));
     }
+
+    #[test]
+    fn load_nop() {
+        use super::load_prog;
+        use super::Instr;
+        use super::Op;
+        use super::Value;
+        let prog = load_prog("./json/nop.json");
+
+        assert_eq!(prog.functions.len(), 1);
+        let main = &prog.functions[0];
+        assert_eq!(main.name, "main");
+        let instrs = &main.instrs;
+        let expected_instrs: [Instr; 5] = [
+            Instr::Op(Op {
+                op: String::from("nop"),
+                dest: None,
+                typ: None,
+                args: None,
+                funcs: None,
+                labels: None,
+                value: None,
+            }),
+            Instr::Op(Op {
+                dest: Some(String::from("v")),
+                op: String::from("const"),
+                typ: Some(String::from("int")),
+                value: Some(Value::Int(5.0)),
+                args: None,
+                funcs: None,
+                labels: None,
+            }),
+            Instr::Op(Op {
+                op: String::from("nop"),
+                dest: None,
+                typ: None,
+                args: None,
+                funcs: None,
+                labels: None,
+                value: None,
+            }),
+            Instr::Op(Op {
+                args: Some(vec![String::from("v")]),
+                op: String::from("print"),
+                dest: None,
+                typ: None,
+                funcs: None,
+                labels: None,
+                value: None,
+            }),
+            Instr::Op(Op {
+                op: String::from("nop"),
+                dest: None,
+                typ: None,
+                args: None,
+                funcs: None,
+                labels: None,
+                value: None,
+            }),
+        ];
+        assert!(expected_instrs.iter().eq(instrs.iter()));
+    }
 }
