@@ -1,0 +1,30 @@
+@main {
+  v0: float = const 0;
+  a: float = id v0;
+  v1: float = const 1;
+  b: float = id v1;
+  v3: float = const 0;
+  i: float = id v3;
+.for.cond.2:
+  v4: float = id i;
+  v5: float = const 10;
+  v6: bool = flt v4 v5;
+  br v6 .for.body.2 .for.end.2;
+.for.body.2:
+  v7: float = id a;
+  tmpA: float = id v7;
+  v8: float = id b;
+  tmpB: float = id v8;
+  v9: float = id tmpB;
+  a: float = id v9;
+  v10: float = id tmpA;
+  v11: float = id tmpB;
+  v12: float = fadd v10 v11;
+  b: float = id v12;
+  v13: float = id i;
+  v14: float = const 1;
+  v15: float = fadd v13 v14;
+  i: float = id v15;
+  jmp .for.cond.2;
+.for.end.2:
+}
