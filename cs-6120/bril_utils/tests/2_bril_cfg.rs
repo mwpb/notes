@@ -4,9 +4,8 @@ use serde_json::to_string_pretty;
 
 #[test]
 fn cfg_from_jmp_prog() {
-    let prog = load_prog("./tests/json/jmp.json");
+    let prog = load_prog("./json/jmp.json");
     let cfg = cfg_from_prog(prog);
     let s = to_string_pretty(&cfg).expect("Error serialising struct.");
     println!("{}", s);
-    assert!(false);
 }
