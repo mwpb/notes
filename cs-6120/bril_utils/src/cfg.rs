@@ -3,7 +3,6 @@ use crate::validate::{is_terminator, Func, Instr, Prog};
 pub fn cfg_from_prog(prog: Prog) -> Vec<Vec<Instr>> {
     let mut basic_blocks: Vec<Vec<Instr>> = Vec::new();
     for func in prog.functions {
-        println!("{}", func.name);
         basic_blocks.append(&mut basic_blocks_from_func(func));
     }
     basic_blocks
