@@ -5,3 +5,5 @@ Notes on the self-guided version of the [Cornell CS 6120 course](https://www.cs.
 [Lecture 1: welcome and overview](./1-overview/index.md)
 
 [Lecture 2: representing programmes](./2-representing-programmes/index.md)
+
+[Lecture 3: local analysis and optimisation](./3-local-analysis-and-optimisation/index.md)
