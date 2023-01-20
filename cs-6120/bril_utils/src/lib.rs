@@ -1,4 +1,5 @@
 pub mod cfg;
+pub mod dead_code_elimination;
 pub mod labels;
 pub mod validate;
 

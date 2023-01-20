@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::fs;
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -8,59 +8,168 @@ pub struct Arg {
     pub typ: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Label {
     pub label: String,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(untagged)]
 pub enum Value {
-    Int(f64),
+    Int(usize),
     Bool(bool),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct Op {
-    pub op: String,
-    pub dest: Option<String>,
-    #[serde(alias = "type")]
-    pub typ: Option<String>,
-    pub args: Option<Vec<String>>,
-    pub funcs: Option<Vec<String>>,
-    pub labels: Option<Vec<String>>,
-    pub value: Option<Value>,
+fn default_empty_vec() -> Vec<String> {
+    Vec::new()
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[serde(tag = "op")]
+#[serde(rename_all = "lowercase")]
+pub enum Op {
+    Const {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        value: Value,
+    },
+    // Arithmetic
+    Add {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Mul {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Sub {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Div {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    // Comparison
+    Eq {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Lt {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Gt {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Le {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Ge {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    // Logic
+    Not {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 1],
+    },
+    And {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    Or {
+        dest: String,
+        #[serde(alias = "type")]
+        typ: String,
+        args: [String; 2],
+    },
+    // Control
+    Jmp {
+        labels: [String; 1],
+    },
+    Br {
+        args: [bool; 1],
+        labels: [String; 2],
+    },
+    Call {
+        dest: Option<String>,
+        args: Vec<String>,
+        funcs: [String; 1],
+        #[serde(alias = "type")]
+        typ: String,
+    },
+    Ret {
+        args: Vec<String>,
+    },
+    // Miscellaneous
+    Print {
+        #[serde(default = "default_empty_vec")]
+        args: Vec<String>,
+    },
+    Nop {},
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 #[serde(untagged)]
 pub enum Instr {
     Op(Op),
     Label(Label),
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Func {
     pub name: String,
-    pub args: Option<Vec<String>>,
+    #[serde(default = "default_empty_vec")]
+    pub args: Vec<String>,
     #[serde(alias = "type")]
     pub typ: Option<String>,
-    pub instrs: Vec<Instr>,
+    #[serde(deserialize_with = "to_bbs")]
+    pub instrs: Vec<Vec<Instr>>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+fn to_bbs<'de, D>(deserializer: D) -> Result<Vec<Vec<Instr>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let s: Vec<Instr> = Deserialize::deserialize(deserializer)?;
+    Ok(vec![s])
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Prog {
     pub functions: Vec<Func>,
 }
 
-pub fn is_terminator(i: &Op) -> bool {
-    ["jmp", "br", "ret"].contains(&i.op.as_str())
-}
-
-pub fn load_prog(path: &str) -> Prog {
-    let data = fs::File::open(path).expect("Error loading file.");
-    let value = serde_json::from_reader(data).expect("Error parsing file.");
-    serde_json::from_value(value).unwrap()
+pub fn load_prog<'a>(path: &str) -> Prog {
+    let data = fs::read_to_string(&path).expect("Error loading file.");
+    let prog: Prog = serde_json::from_str(&data).expect("Error parsing file.");
+    prog
 }
 
 #[cfg(test)]
@@ -80,47 +189,27 @@ mod tests {
         assert_eq!(main.name, "main");
         let instrs = &main.instrs;
         let expected_instrs: [Instr; 5] = [
-            Instr::Op(Op {
-                op: String::from("const"),
-                dest: Some(String::from("v")),
-                typ: Some(String::from("int")),
-                args: None,
-                funcs: None,
-                labels: None,
-                value: Some(Value::Int(4.0)),
+            Instr::Op(Op::Const {
+                dest: "v".into(),
+                typ: "int".into(),
+                value: Value::Int(4),
             }),
-            Instr::Op(Op {
-                op: String::from("jmp"),
-                dest: None,
-                typ: None,
-                args: None,
-                funcs: None,
-                labels: Some(vec![String::from("somewhere")]),
-                value: None,
+            Instr::Op(Op::Jmp {
+                labels: [String::from("somewhere")],
             }),
-            Instr::Op(Op {
-                op: String::from("const"),
-                dest: Some(String::from("v")),
-                typ: Some(String::from("int")),
-                args: None,
-                funcs: None,
-                labels: None,
-                value: Some(Value::Int(2.0)),
+            Instr::Op(Op::Const {
+                dest: "v".into(),
+                typ: "int".into(),
+                value: Value::Int(2),
             }),
             Instr::Label(Label {
                 label: String::from("somewhere"),
             }),
-            Instr::Op(Op {
-                op: String::from("print"),
-                dest: None,
-                typ: None,
-                args: Some(vec![String::from("v")]),
-                funcs: None,
-                labels: None,
-                value: None,
+            Instr::Op(Op::Print {
+                args: vec!["v".into()],
             }),
         ];
-        assert!(expected_instrs.iter().eq(instrs.iter()));
+        assert!(expected_instrs.iter().eq(instrs[0].iter()));
     }
 
     #[test]
@@ -136,52 +225,18 @@ mod tests {
         assert_eq!(main.name, "main");
         let instrs = &main.instrs;
         let expected_instrs: [Instr; 5] = [
-            Instr::Op(Op {
-                op: String::from("nop"),
-                dest: None,
-                typ: None,
-                args: None,
-                funcs: None,
-                labels: None,
-                value: None,
+            Instr::Op(Op::Nop {}),
+            Instr::Op(Op::Const {
+                dest: "v".into(),
+                typ: "int".into(),
+                value: Value::Int(5),
             }),
-            Instr::Op(Op {
-                dest: Some(String::from("v")),
-                op: String::from("const"),
-                typ: Some(String::from("int")),
-                value: Some(Value::Int(5.0)),
-                args: None,
-                funcs: None,
-                labels: None,
+            Instr::Op(Op::Nop {}),
+            Instr::Op(Op::Print {
+                args: vec!["v".into()],
             }),
-            Instr::Op(Op {
-                op: String::from("nop"),
-                dest: None,
-                typ: None,
-                args: None,
-                funcs: None,
-                labels: None,
-                value: None,
-            }),
-            Instr::Op(Op {
-                args: Some(vec![String::from("v")]),
-                op: String::from("print"),
-                dest: None,
-                typ: None,
-                funcs: None,
-                labels: None,
-                value: None,
-            }),
-            Instr::Op(Op {
-                op: String::from("nop"),
-                dest: None,
-                typ: None,
-                args: None,
-                funcs: None,
-                labels: None,
-                value: None,
-            }),
+            Instr::Op(Op::Nop {}),
         ];
-        assert!(expected_instrs.iter().eq(instrs.iter()));
+        assert!(expected_instrs.iter().eq(instrs[0].iter()));
     }
 }
