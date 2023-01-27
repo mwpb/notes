@@ -114,7 +114,7 @@ pub enum Op {
         labels: [String; 1],
     },
     Br {
-        args: [bool; 1],
+        args: [String; 1],
         labels: [String; 2],
     },
     Call {
@@ -133,6 +133,60 @@ pub enum Op {
         args: Vec<String>,
     },
     Nop {},
+}
+
+pub fn get_args(instr: &Instr) -> Vec<String> {
+    let op = match instr {
+        Instr::Label(l) => return vec![],
+        Instr::Op(o) => o,
+    };
+    match op {
+        Op::Add { args, .. }
+        | Op::Mul { args, .. }
+        | Op::Sub { args, .. }
+        | Op::Div { args, .. }
+        | Op::Eq { args, .. }
+        | Op::Lt { args, .. }
+        | Op::Gt { args, .. }
+        | Op::Ge { args, .. }
+        | Op::Le { args, .. }
+        | Op::And { args, .. }
+        | Op::Or { args, .. } => args.clone().to_vec(),
+        Op::Br { args, .. } | Op::Not { args, .. } => args.clone().to_vec(),
+        Op::Call { args, .. } | Op::Ret { args, .. } | Op::Print { args, .. } => {
+            args.clone().to_vec()
+        }
+        Op::Const { .. } | Op::Nop { .. } | Op::Jmp { .. } => vec![],
+    }
+}
+
+pub fn get_dest(instr: &Instr) -> Option<String> {
+    let op = match instr {
+        Instr::Label(l) => return None,
+        Instr::Op(o) => o,
+    };
+    match op {
+        Op::Add { dest, .. }
+        | Op::Mul { dest, .. }
+        | Op::Sub { dest, .. }
+        | Op::Div { dest, .. }
+        | Op::Eq { dest, .. }
+        | Op::Lt { dest, .. }
+        | Op::Gt { dest, .. }
+        | Op::Ge { dest, .. }
+        | Op::Le { dest, .. }
+        | Op::And { dest, .. }
+        | Op::Const { dest, .. }
+        | Op::Or { dest, .. }
+        | Op::Not { dest, .. } => Some(dest.clone()),
+        Op::Call { dest, .. } => dest.clone(),
+        Op::Ret { .. }
+        | Op::Print { .. }
+        | Op::Br { .. }
+        | Op::Jmp { .. }
+        | Op::Jmp { .. }
+        | Op::Nop {} => None,
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
